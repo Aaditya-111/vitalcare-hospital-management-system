@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Chatbot from './components/Chatbot'
@@ -14,7 +14,20 @@ import Contacts from './components/Contacts'
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState('home')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+    return false;
+  });
+
+  // Update localStorage when isLoggedIn changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isLoggedIn', isLoggedIn);
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = () => {
     setIsLoggedIn(true)
