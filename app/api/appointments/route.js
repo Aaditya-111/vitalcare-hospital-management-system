@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma.js'
 
+export const dynamic = 'force-dynamic' // Prevent static generation
+
 export async function GET(request) {
+  // Return empty array during build
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json([])
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -28,6 +35,14 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  // Return a mock response during build
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({ 
+      id: 'mock-id',
+      message: 'In development mode - appointment not created'
+    }, { status: 200 })
+  }
+
   try {
     const data = await request.json()
     
