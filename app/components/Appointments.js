@@ -1,8 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function Appointments() {
+// Only import and use the client-side code when in the browser
+const DynamicAppointments = () => {
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    )
+  }
+  
+  return <AppointmentsContent />
+}
+
+function AppointmentsContent() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -66,6 +85,11 @@ export default function Appointments() {
         </div>
       </div>
     )
+  }
+
+  // Don't render the form during SSR
+  if (typeof window === 'undefined') {
+    return null
   }
 
   return (
@@ -181,3 +205,5 @@ export default function Appointments() {
     </div>
   )
 }
+
+export default DynamicAppointments
