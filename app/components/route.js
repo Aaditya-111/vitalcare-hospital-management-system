@@ -4,7 +4,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     
-    
+    // Validate required fields
     const { patientName, phone, department, preferredDate, preferredTime, reasonForVisit } = body;
     
     if (!patientName || !phone || !department || !preferredDate || !preferredTime || !reasonForVisit) {
@@ -14,17 +14,15 @@ export async function POST(request) {
       );
     }
 
-    
-    
-    
+    // Log the appointment data
     console.log('New appointment request:', body);
     
-    
+    // Return success response
     return NextResponse.json(
       { 
         success: true, 
         message: 'Appointment request received',
-        appointmentId: Date.now() 
+        appointmentId: Date.now()
       },
       { status: 200 }
     );
@@ -38,10 +36,9 @@ export async function POST(request) {
   }
 }
 
-
 export async function GET(request) {
-  try{
-    const appointments = []; 
+  try {
+    const appointments = [];
     
     return NextResponse.json({
       success: true,
