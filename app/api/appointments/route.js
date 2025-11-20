@@ -1,88 +1,35 @@
-import { NextResponse } from 'next/server'
-import prisma from '../../../lib/prisma.js'
+import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic' // Prevent static generation
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
-  // Return empty array during build
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return NextResponse.json([])
-  }
-
   try {
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    
-    const where = status ? { status } : {}
-    
-    const appointments = await prisma.appointment.findMany({
-      where,
-      include: {
-        patient: true,
-        doctor: true
-      },
-      orderBy: { createdAt: 'desc' }
-    })
-    
-    return NextResponse.json(appointments)
-  } catch (error) {
-    console.error('Error fetching appointments:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch appointments' },
-      { status: 500 }
-    )
-  }
-}
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type');
 
-export async function POST(request) {
-  // Return a mock response during build
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return NextResponse.json({ 
-      id: 'mock-id',
-      message: 'In development mode - appointment not created'
-    }, { status: 200 })
-  }
+    // Mock data for now - replace with your actual Prisma query later
+    const vaccinations = [
+      { id: 1, name: 'COVID-19', type: 'covid', available: true },
+      { id: 2, name: 'Flu Shot', type: 'flu', available: true },
+      { id: 3, name: 'Hepatitis B', type: 'hepatitis', available: true },
+    ];
 
-  try {
-    const data = await request.json()
-    
-    // Create or find patient
-    let patient = await prisma.patient.findFirst({
-      where: { phone: data.phone }
-    })
-    
-    if (!patient) {
-      patient = await prisma.patient.create({
-        data: {
-          name: data.patientName,
-          phone: data.phone
-        }
-      })
-    }
-    
-    // Create appointment
-    const appointment = await prisma.appointment.create({
-      data: {
-        patientId: patient.id,
-        patientName: data.patientName,
-        phone: data.phone,
-        department: data.department,
-        preferredDate: new Date(data.preferredDate),
-        preferredTime: data.preferredTime,
-        reasonForVisit: data.reasonForVisit,
-        status: 'pending'
+    // Filter by type if provided
+    const filtered = type 
+      ? vaccinations.filter(v => v.type === type)
+      : vaccinations;
+
+    return NextResponse.json(filtered, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
       },
-      include: {
-        patient: true
-      }
-    })
-    
-    return NextResponse.json(appointment, { status: 201 })
+    });
   } catch (error) {
-    console.error('Error creating appointment:', error)
+    console.error('Error fetching vaccinations:', error);
     return NextResponse.json(
-      { error: 'Failed to create appointment' },
+      { error: 'Failed to fetch vaccinations' },
       { status: 500 }
-    )
+    );
   }
 }
