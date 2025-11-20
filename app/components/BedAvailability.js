@@ -16,7 +16,8 @@ export default function BedAvailability() {
       const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
       
       const response = await fetch('/api/beds', {
-        signal: controller.signal
+        signal: controller.signal,
+        cache: 'no-store'
       })
       clearTimeout(timeoutId)
       
