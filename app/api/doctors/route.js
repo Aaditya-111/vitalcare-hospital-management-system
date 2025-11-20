@@ -1,42 +1,26 @@
-import { NextResponse } from 'next/server'
-import prisma from '../../../lib/prisma.js'
+import { NextResponse } from 'next/server';
 
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const department = searchParams.get('department')
-    
-    const where = department ? { department } : {}
-    
-    const doctors = await prisma.doctor.findMany({
-      where,
-      orderBy: { name: 'asc' }
-    })
-    
-    return NextResponse.json(doctors)
-  } catch (error) {
-    console.error('Error fetching doctors:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch doctors' },
-      { status: 500 }
-    )
-  }
-}
+export const dynamic = 'force-dynamic';
 
-export async function POST(request) {
+export async function GET() {
   try {
-    const data = await request.json()
-    
-    const doctor = await prisma.doctor.create({
-      data
-    })
-    
-    return NextResponse.json(doctor, { status: 201 })
+    const doctors = [
+      { id: 1, name: 'Dr. Anand patel', specialty: 'Cardiology', available: true },
+      { id: 2, name: 'Dr. Ashok singh', specialty: 'Pediatrics', available: true },
+      { id: 3, name: 'Dr. C.H Yogesh', specialty: 'Neurology', available: false },
+    ];
+
+    return NextResponse.json(doctors, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    });
   } catch (error) {
-    console.error('Error creating doctor:', error)
+    console.error('Error in doctors API:', error);
     return NextResponse.json(
-      { error: 'Failed to create doctor' },
+      { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }
