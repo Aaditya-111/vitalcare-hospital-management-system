@@ -1,27 +1,20 @@
-import { NextResponse } from 'next/server'
-import prisma from '../../../lib/prisma.js'
+import { NextResponse } from 'next/server';
 
-export async function GET(request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const ward = searchParams.get('ward')
-    const available = searchParams.get('available')
-    
-    const where = {}
-    if (ward) where.ward = ward
-    if (available !== null) where.available = available === 'true'
-    
-    const beds = await prisma.bed.findMany({
-      where,
-      orderBy: { bedNumber: 'asc' }
-    })
-    
-    return NextResponse.json(beds)
+    // Your bed data - replace with your actual data source
+    const beds = [
+      { id: 1, type: 'ICU', available: 5, total: 10 },
+      { id: 2, type: 'General', available: 15, total: 30 },
+      { id: 3, type: 'Emergency', available: 8, total: 20 }
+    ];
+
+    return NextResponse.json(beds);
   } catch (error) {
-    console.error('Error fetching beds:', error)
+    console.error('Error fetching beds:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch beds' },
+      { error: 'Failed to fetch bed data' },
       { status: 500 }
-    )
+    );
   }
 }
