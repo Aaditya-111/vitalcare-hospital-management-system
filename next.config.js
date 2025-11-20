@@ -12,10 +12,7 @@ const nextConfig = {
   // Disable static optimization for all pages
   generateEtags: false,
   // Disable static optimization for API routes
-  api: {
-    bodyParser: false,
-    externalResolver: true,
-  },
+  
   // Disable static optimization for all pages
   poweredByHeader: false,
   // Disable static optimization for all pages
