@@ -4,38 +4,43 @@ import { useState, useEffect } from 'react'
 
 export default function BedAvailability() {
   const [beds, setBeds] = useState([])
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
-  
+
   useEffect(() => {
     fetchBeds()
   }, [])
-  
+
   const fetchBeds = async () => {
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-      
+
       const response = await fetch('/api/beds', {
         signal: controller.signal,
         cache: 'no-store'
       })
       clearTimeout(timeoutId)
-      
+
       if (response.ok) {
         const data = await response.json()
-        setBeds(data)
+        // Extract beds array from response object
+        setBeds(data.beds || [])
+        setSummary(data.summary || null)
       } else {
         console.warn('API failed, using fallback data')
         setBeds(fallbackBeds)
+        setSummary(null)
       }
     } catch (error) {
       console.warn('Error fetching beds, using fallback data:', error.message)
       setBeds(fallbackBeds)
+      setSummary(null)
     } finally {
       setLoading(false)
     }
   }
-  
+
   const fallbackBeds = [
     // Ward A
     { id: 'Ward A - 101', available: true },
@@ -44,7 +49,7 @@ export default function BedAvailability() {
     { id: 'Ward A - 104', available: true },
     { id: 'Ward A - 105', available: false },
     { id: 'Ward A - 106', available: true },
-    
+
     // Ward B
     { id: 'Ward B - 201', available: false },
     { id: 'Ward B - 202', available: true },
@@ -52,7 +57,7 @@ export default function BedAvailability() {
     { id: 'Ward B - 204', available: true },
     { id: 'Ward B - 205', available: true },
     { id: 'Ward B - 206', available: false },
-    
+
     // ICU
     { id: 'ICU - 01', available: false },
     { id: 'ICU - 02', available: false },
@@ -60,7 +65,7 @@ export default function BedAvailability() {
     { id: 'ICU - 04', available: false },
     { id: 'ICU - 05', available: true },
     { id: 'ICU - 06', available: false },
-    
+
     // Emergency
     { id: 'Emergency - E1', available: true },
     { id: 'Emergency - E2', available: true },
@@ -78,7 +83,7 @@ export default function BedAvailability() {
       </div>
     )
   }
-  
+
   return (
     <div className="min-h-screen py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,24 +103,21 @@ export default function BedAvailability() {
 
         {/* Bed Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {beds.map((bed, index) => (
+          {beds.map((bed) => (
             <div
-              key={index}
-              className={`card flex items-center justify-between ${
-                bed.available ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'
-              }`}
+              key={bed.id || bed.bedNumber}
+              className={`card flex items-center justify-between ${bed.available ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'
+                }`}
             >
               <div>
-                <p className="font-bold text-gray-900">{bed.id}</p>
-                <p className={`text-sm font-semibold ${
-                  bed.available ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <p className="font-bold text-gray-900">{bed.bedNumber || bed.id}</p>
+                <p className={`text-sm font-semibold ${bed.available ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   {bed.available ? 'Available' : 'Occupied'}
                 </p>
               </div>
-              <div className={`w-6 h-6 rounded-full ${
-                bed.available ? 'bg-green-500' : 'bg-red-500'
-              }`}></div>
+              <div className={`w-6 h-6 rounded-full ${bed.available ? 'bg-green-500' : 'bg-red-500'
+                }`}></div>
             </div>
           ))}
         </div>

@@ -11,67 +11,67 @@ export default function Chatbot({ setCurrentPage }) {
 
   const getBotResponse = async (userMessage) => {
     const msg = userMessage.toLowerCase()
-    
-    // Check for navigation keywords first
-    if (msg.includes('doctor') || msg.includes('specialist')) {
-      return {
-        text: 'You can view our specialists and their profiles here:',
-        link: { text: 'View Doctors', page: 'doctors' }
-      }
-    }
-    
-    if (msg.includes('appointment') || msg.includes('book')) {
+
+    // Check for quick navigation keywords first - these provide instant responses
+    if (msg.includes('appointment') && msg.includes('book')) {
       return {
         text: 'I can help you book an appointment:',
         link: { text: 'Book Appointment', page: 'appointments' }
       }
     }
-    
-    if (msg.includes('bed') || msg.includes('available')) {
+
+    if (msg.includes('bed') && (msg.includes('available') || msg.includes('availability'))) {
       return {
         text: 'Check our real-time bed availability:',
         link: { text: 'View Bed Availability', page: 'beds' }
       }
     }
-    
-    if (msg.includes('contact') || msg.includes('phone')) {
+
+    if (msg.includes('contact') && msg.includes('number')) {
       return {
         text: 'Find all our important contact numbers:',
         link: { text: 'View Contacts', page: 'contacts' }
       }
     }
-    
-    if (msg.includes('vaccine') || msg.includes('dog bite') || msg.includes('snake')) {
-      return {
-        text: 'Check vaccination availability including emergency vaccines:',
-        link: { text: 'View Vaccinations', page: 'vaccinations' }
-      }
-    }
-    
-    // If message contains medical symptoms, use AI analysis
-    if (msg.includes('pain') || msg.includes('fever') || msg.includes('symptom') || 
-        msg.includes('sick') || msg.includes('hurt') || msg.includes('ache')) {
-      try {
-        const response = await fetch('/api/chatbot', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: userMessage })
-        })
-        
-        if (response.ok) {
-          const data = await response.json()
-          return {
-            text: data.response,
-            link: { text: 'Book Appointment', page: 'appointments' }
-          }
+
+    // For all other questions, use AI to provide intelligent responses
+    try {
+      const response = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+
+        // Add relevant navigation link based on AI response content
+        const responseText = data.response.toLowerCase()
+        let link = null
+
+        if (responseText.includes('appointment') || responseText.includes('book')) {
+          link = { text: 'Book Appointment', page: 'appointments' }
+        } else if (responseText.includes('doctor') || responseText.includes('specialist')) {
+          link = { text: 'View Doctors', page: 'doctors' }
+        } else if (responseText.includes('cardiology') || responseText.includes('neurology') ||
+          responseText.includes('department')) {
+          link = { text: 'Book Appointment', page: 'appointments' }
+        } else if (responseText.includes('vaccine') || responseText.includes('vaccination')) {
+          link = { text: 'View Vaccinations', page: 'vaccinations' }
         }
-      } catch (error) {
-        console.error('AI chatbot error:', error)
+
+        return {
+          text: data.response,
+          link: link
+        }
       }
+    } catch (error) {
+      console.error('AI chatbot error:', error)
     }
-    
+
+    // Fallback response if API fails
     return {
-      text: "I can help you with:\n• Finding doctors and specialists\n• Booking appointments\n• Checking bed availability\n• Vaccination information\n• Contact details\n\nYou can also describe your symptoms for department recommendations!"
+      text: "I'm here to help! I can assist with:\n• Medical questions and symptoms\n• Finding doctors and specialists\n• Booking appointments\n• Checking bed availability\n• Vaccination information\n• Hospital services\n\nWhat would you like to know?"
     }
   }
 
@@ -80,12 +80,12 @@ export default function Chatbot({ setCurrentPage }) {
 
     const userMsg = { text: input, sender: 'user' }
     setMessages(prev => [...prev, userMsg])
-    
+
     // Show typing indicator
     setMessages(prev => [...prev, { text: 'Typing...', sender: 'bot', isTyping: true }])
 
     const response = await getBotResponse(input)
-    
+
     // Remove typing indicator and add real response
     setTimeout(() => {
       setMessages(prev => prev.filter(msg => !msg.isTyping))

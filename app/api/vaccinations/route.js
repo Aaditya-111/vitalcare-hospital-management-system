@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,19 +8,20 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
 
-    // Mock data for now - replace with your actual Prisma query later
-    const vaccinations = [
-      { id: 1, name: 'COVID-19', type: 'covid', available: true },
-      { id: 2, name: 'Flu Shot', type: 'flu', available: true },
-      { id: 3, name: 'Hepatitis B', type: 'hepatitis', available: true },
-    ];
+    // Build query based on filters
+    const where = {};
+    if (type) {
+      where.type = type;
+    }
 
-    // Filter by type if provided
-    const filtered = type 
-      ? vaccinations.filter(v => v.type === type)
-      : vaccinations;
+    const vaccinations = await prisma.vaccination.findMany({
+      where,
+      orderBy: {
+        name: 'asc',
+      },
+    });
 
-    return NextResponse.json(filtered, {
+    return NextResponse.json(vaccinations, {
       status: 200,
       headers: {
         'Cache-Control': 'no-store, max-age=0',
@@ -28,7 +30,63 @@ export async function GET(request) {
   } catch (error) {
     console.error('Error fetching vaccinations:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch vaccinations' },
+      { error: 'Failed to fetch vaccinations', details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Update vaccination stock or create new vaccination
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { name, type, available, stock, description } = body;
+
+    // Validate required fields
+    if (!name || !type) {
+      return NextResponse.json(
+        { error: 'name and type are required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if vaccination exists
+    const existingVaccination = await prisma.vaccination.findFirst({
+      where: { name },
+    });
+
+    let vaccination;
+    if (existingVaccination) {
+      // Update existing vaccination
+      vaccination = await prisma.vaccination.update({
+        where: { id: existingVaccination.id },
+        data: {
+          available: available ?? existingVaccination.available,
+          stock: stock ?? existingVaccination.stock,
+          description: description ?? existingVaccination.description,
+        },
+      });
+    } else {
+      // Create new vaccination
+      vaccination = await prisma.vaccination.create({
+        data: {
+          name,
+          type,
+          available: available ?? true,
+          stock: stock ?? 0,
+          description,
+        },
+      });
+    }
+
+    return NextResponse.json(
+      { message: 'Vaccination updated successfully', vaccination },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error updating vaccination:', error);
+    return NextResponse.json(
+      { error: 'Failed to update vaccination', details: error.message },
       { status: 500 }
     );
   }
