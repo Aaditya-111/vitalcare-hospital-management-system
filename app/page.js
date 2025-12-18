@@ -13,9 +13,12 @@ import BedAvailability from './components/BedAvailability'
 import Vaccinations from './components/Vaccinations'
 import Appointments from './components/Appointments'
 import Contacts from './components/Contacts'
+import AuthModal from './components/AuthModal'
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState('home')
+  const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
@@ -41,8 +44,13 @@ export default function Page() {
     setCurrentPage('home')
   }
 
+  const openAuth = (mode = 'login') => {
+    setAuthMode(mode)
+    setIsAuthOpen(true)
+  }
+
   const renderPage = () => {
-    switch(currentPage) {
+    switch (currentPage) {
       case 'home': return <Home setCurrentPage={setCurrentPage} />
       case 'login': return <Login onLogin={handleLogin} />
       case 'doctors': return <Doctors setCurrentPage={setCurrentPage} />
@@ -56,17 +64,21 @@ export default function Page() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar 
-        currentPage={currentPage} 
+      <Navbar
+        currentPage={currentPage}
         setCurrentPage={setCurrentPage}
-        isLoggedIn={isLoggedIn}
-        onLogout={handleLogout}
+        openAuth={openAuth}
       />
       <main className="flex-grow">
         {renderPage()}
       </main>
       <Footer />
       <Chatbot setCurrentPage={setCurrentPage} />
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        initialMode={authMode}
+      />
     </div>
   )
 }

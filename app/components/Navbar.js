@@ -1,4 +1,8 @@
-export default function Navbar({ currentPage, setCurrentPage, isLoggedIn, onLogout }) {
+import { useSession, signOut } from "next-auth/react"
+import Link from 'next/link'
+
+export default function Navbar({ currentPage, setCurrentPage, openAuth }) {
+  const { data: session } = useSession()
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'doctors', label: 'Doctors' },
@@ -47,17 +51,24 @@ export default function Navbar({ currentPage, setCurrentPage, isLoggedIn, onLogo
 
           {/* Login/Logout Button */}
           <div>
-            {isLoggedIn ? (
-              <button
-                onClick={onLogout}
-                className="bg-neutral-700 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-neutral-800 transition-all duration-300 shadow-soft hover:shadow-medium hover:-translate-y-0.5"
-              >
-                Logout
-              </button>
+            {session ? (
+              <div className="flex items-center gap-4">
+                {/* Dashboard Link based on role */}
+                {session.user.role === 'DOCTOR' && <Link href="/doctor/dashboard" className="text-sm font-semibold hover:text-primary">Dashboard</Link>}
+                {session.user.role === 'PATIENT' && <Link href="/patient/dashboard" className="text-sm font-semibold hover:text-primary">Dashboard</Link>}
+                {session.user.role === 'ADMIN' && <Link href="/admin/dashboard" className="text-sm font-semibold hover:text-primary">Dashboard</Link>}
+
+                <button
+                  onClick={() => signOut()}
+                  className="bg-neutral-700 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-neutral-800 transition-all duration-300 shadow-soft hover:shadow-medium hover:-translate-y-0.5"
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <button
-                onClick={() => setCurrentPage('login')}
-                className="bg-white text-primary px-6 py-2.5 rounded-xl font-semibold border-2 border-primary transition-all duration-300 shadow-medium hover:shadow-glow hover:-translate-y-0.5 hover:scale-105"
+                onClick={() => openAuth && openAuth('login')} // Safety check
+                className="bg-white text-primary px-6 py-2.5 rounded-xl font-semibold border-2 border-primary transition-all duration-300 shadow-medium hover:shadow-glow hover:-translate-y-0.5 hover:scale-105 inline-block"
               >
                 Login / Signup
               </button>
@@ -81,6 +92,6 @@ export default function Navbar({ currentPage, setCurrentPage, isLoggedIn, onLogo
           ))}
         </div>
       </div>
-    </nav>
+    </nav >
   )
 }

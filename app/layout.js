@@ -1,5 +1,6 @@
 import './globals.css'
 import { Inter, Manrope } from 'next/font/google'
+import { Providers } from './providers'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,7 +25,9 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }
