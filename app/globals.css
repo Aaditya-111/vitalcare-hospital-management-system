@@ -11,14 +11,26 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
   }
+
+  p {
+    line-height: 1.7;
+  }
+
+
+
+  :focus-visible {
+    outline: 2px solid #059669;
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
   /* Modern Buttons with Glow Effects */
   .btn-primary {
     @apply bg-primary text-white px-8 py-4 rounded-xl font-semibold 
-           transition-all duration-300 shadow-medium
-           hover:shadow-glow hover:-translate-y-1 hover:scale-105
+           transition-colors duration-200 shadow-medium
+           hover:bg-primary-700
+           active:scale-[0.98]
            flex items-center gap-3 justify-center;
   }
   
@@ -34,7 +46,7 @@
   }
   
   .glass-card {
-    @apply bg-white/60 backdrop-blur-md border border-white/30 
+    @apply bg-white/80 backdrop-blur-md border border-white/30 
            rounded-2xl shadow-medium hover:shadow-layered
            transition-all duration-300;
   }
@@ -42,8 +54,8 @@
   /* Enhanced Cards with Layered Shadows */
   .card {
     @apply bg-white rounded-2xl shadow-layered 
-           transition-all duration-300 p-8
-           hover:shadow-glow-teal hover:-translate-y-2;
+           transition-shadow duration-200 p-8
+           hover:shadow-medium;
   }
   
   /* Input Fields */
@@ -57,7 +69,7 @@
   .gradient-mesh {
     background: linear-gradient(135deg, #059669 0%, #10B981 50%, #34D399 100%);
     background-size: 200% 200%;
-    animation: gradient-shift 8s ease infinite;
+    
   }
   
   .gradient-dark {
@@ -72,11 +84,7 @@
   }
 }
 
-/* Custom Animations */
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
+
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -98,5 +106,10 @@
 
 /* Smooth Transitions */
 * {
+  transition: none;
+}
+
+button, a, .card {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
 }

@@ -30,26 +30,30 @@ A modern, responsive Hospital Management System built with Next.js, Tailwind CSS
 ### Basic Setup (Frontend Only)
 
 1. **Install dependencies:**
+
 ```bash
 npm install
 ```
 
 2. **Run the development server:**
+
 ```bash
 npm run dev
 ```
 
 3. **Open your browser:**
-Navigate to `http://localhost:3000`
+   Navigate to `http://localhost:3000`
 
 ### Full Setup (With Backend & Database)
 
 1. **Install dependencies:**
+
 ```bash
 npm install
 ```
 
 2. **Create `.env` file in root directory:**
+
 ```bash
 DATABASE_URL="file:./dev.db"
 HUGGINGFACE_API_KEY="your_huggingface_api_key_here"
@@ -57,12 +61,14 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"
 ```
 
 3. **Get Hugging Face API Key:**
+
    - Visit https://huggingface.co/
    - Sign up/Login
    - Go to Settings → Access Tokens
    - Create new token and copy to `.env`
 
 4. **Setup Prisma:**
+
 ```bash
 # Create prisma directory
 mkdir prisma
@@ -74,16 +80,19 @@ npx prisma db push
 ```
 
 5. **Seed database (optional):**
+
 ```bash
 node scripts/seed.js
 ```
 
 6. **Run the development server:**
+
 ```bash
 npm run dev
 ```
 
 7. **View database (optional):**
+
 ```bash
 npx prisma studio
 ```
@@ -98,6 +107,7 @@ npm start
 ## Features Overview
 
 ### Navigation
+
 - Sticky navbar with all page links
 - Login/Logout functionality
 - Responsive mobile menu
@@ -105,34 +115,41 @@ npm start
 ### Pages
 
 **Home**
+
 - Hero section with call-to-action
 - 3 feature cards
 - Statistics section
 
 **Login**
+
 - Simple authentication (simulated)
 - Redirects to Doctors page after login
 
 **Doctors**
+
 - 5 department tabs
 - 3 doctors per department
 - Book appointment buttons
 
 **Bed Availability**
+
 - Green/Red status indicators
 - Summary statistics
 - Grid layout
 
 **Vaccinations**
+
 - Newborn vaccines section
 - Emergency vaccines (Anti-Rabies, Anti-Venom)
 - IN STOCK / OUT OF STOCK indicators
 
 **Appointments**
+
 - Complete booking form
 - Success message after submission
 
 **Contacts**
+
 - Emergency helpline banner
 - Department contact list
 - Click-to-call functionality
@@ -140,6 +157,7 @@ npm start
 ### AI Chatbot
 
 **Keywords:**
+
 - "doctor" or "specialist" → Links to Doctors page
 - "appointment" or "book" → Links to Appointments page
 - "bed" or "available" → Links to Bed Availability page
@@ -149,12 +167,14 @@ npm start
 ## Technology Stack
 
 ### Frontend
+
 - **Framework:** Next.js 14
 - **Styling:** Tailwind CSS
 - **Icons:** SVG icons
 - **State Management:** React Hooks
 
 ### Backend (New)
+
 - **Database:** Prisma ORM with SQLite (dev) / PostgreSQL (production)
 - **API:** Next.js API Routes
 - **AI/ML:** Hugging Face Inference API
@@ -163,6 +183,7 @@ npm start
 ## Color Scheme
 
 Primary color: **Emerald Green** (Tailwind's emerald palette)
+
 - emerald-50 to emerald-900
 
 ## Project Structure
@@ -193,12 +214,12 @@ vitalcareHMS/
 ## Future Upgrades
 
 See `FUTURE_UPGRADES.md` for detailed roadmap including:
+
 - 🤖 Real-time AI Chatbot (OpenAI/Dialogflow)
 - 💳 Payment Gateway Integration (Razorpay/Stripe)
 - 🔐 Real Authentication & Database
 - 📧 Email/SMS Notifications
 - 📱 Video Consultation
-- 📊 Admin Dashboard
 - 📄 Medical Records Management
 
 ## Important Files

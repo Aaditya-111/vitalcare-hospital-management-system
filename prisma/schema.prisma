@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -128,5 +129,16 @@ model ChatHistory {
   response  String
   symptoms  String?
   department String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // e.g., "CREATE_APPOINTMENT", "UPDATE_PROFILE"
+  entity    String   // e.g., "Appointment", "Doctor"
+  entityId  String?
+  details   String?  // JSON string for additional info
+  ipAddress String?
   createdAt DateTime @default(now())
 }
