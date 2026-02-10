@@ -2,9 +2,19 @@
 
 import { useState } from 'react'
 
+interface Message {
+  text: string;
+  sender: "user" | "bot";
+  isTyping?: boolean;
+  link?: {
+    text: string;
+    page: string;
+  };
+}
+
 export default function Chatbot({ setCurrentPage }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { text: 'Hello! How can I help you today?', sender: 'bot' }
   ])
   const [input, setInput] = useState('')
@@ -79,7 +89,7 @@ export default function Chatbot({ setCurrentPage }) {
     if (!input.trim()) return
 
     const userMsg = { text: input, sender: 'user' }
-    setMessages(prev => [...prev, userMsg])
+    setMessages(prev => [...prev, {text: input, sender: "user"}]);
 
     // Show typing indicator
     setMessages(prev => [...prev, { text: 'Typing...', sender: 'bot', isTyping: true }])
@@ -88,7 +98,7 @@ export default function Chatbot({ setCurrentPage }) {
 
     // Remove typing indicator and add real response
     setTimeout(() => {
-      setMessages(prev => prev.filter(msg => !msg.isTyping))
+      setMessages(prev => prev.filter((msg: Message) => !msg.isTyping))
       setMessages(prev => [...prev, { ...response, sender: 'bot' }])
     }, 500)
 
