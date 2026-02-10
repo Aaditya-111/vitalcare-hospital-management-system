@@ -10,17 +10,15 @@ export default async function AdminDashboard() {
         redirect("/unauthorized")
     }
 
-    const [doctorCount, patientCount, appointmentCount, userCount, recentAppointments] = await Promise.all([
-        prisma.doctor.count(),
-        prisma.patient.count(),
-        prisma.appointment.count(),
-        prisma.user.count(),
-        prisma.appointment.findMany({
-            take: 10,
-            orderBy: { createdAt: 'desc' },
-            include: { doctor: true, patient: true }
-        })
-    ])
+    const doctorCount = await prisma.doctor.count()
+    const patientCount = await prisma.patient.count()
+    const userCount = await prisma.user.count()
+    const appointmentCount = await prisma.appointment.count()
+    const recentAppointments = await prisma.appointment.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: { doctor: true, patient: true }
+    })
 
     const pendingAppointments = await prisma.appointment.count({ where: { status: 'pending' } })
 
