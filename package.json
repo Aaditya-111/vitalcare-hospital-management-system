@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "export": "next build && next export",
-    "start": "next start -H 0.0.0.0 -p ${PORT}"
+    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}"
   },
   "dependencies": {
     "@huggingface/inference": "^2.6.4",
