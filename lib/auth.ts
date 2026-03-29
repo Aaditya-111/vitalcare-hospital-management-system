@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
 export const authOptions: NextAuthOptions = {
@@ -11,7 +12,6 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                const prisma = (await import("@/lib/prisma")).default
                 console.log("Auth attempt for:", credentials?.email)
                 if (!credentials?.email || !credentials?.password) {
                     console.log("Missing email or password")

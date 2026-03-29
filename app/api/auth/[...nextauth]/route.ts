@@ -1,16 +1,27 @@
-import { NextRequest } from "next/server"
+import NextAuth from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export const dynamic = 'force-dynamic'
-export const runtime = 'nodejs'
 
-export async function GET(req: NextRequest, context: { params: { nextauth: string[] } }) {
-    const { default: NextAuth } = await import("next-auth")
-    const { authOptions } = await import("@/lib/auth")
-    return NextAuth(req as any, context as any, authOptions) as any
+let handler: any;
+
+function getHandler() {
+    if (!handler) {
+        // Fallback for build time if env vars are missing
+        if (!process.env.NEXTAUTH_URL) {
+            process.env.NEXTAUTH_URL = process.env.VERCEL_URL 
+                ? `https://${process.env.VERCEL_URL}` 
+                : "http://localhost:3000";
+        }
+        handler = NextAuth(authOptions);
+    }
+    return handler;
 }
 
-export async function POST(req: NextRequest, context: { params: { nextauth: string[] } }) {
-    const { default: NextAuth } = await import("next-auth")
-    const { authOptions } = await import("@/lib/auth")
-    return NextAuth(req as any, context as any, authOptions) as any
+export async function GET(req: Request, context: any) {
+    return getHandler()(req, context);
+}
+
+export async function POST(req: Request, context: any) {
+    return getHandler()(req, context);
 }
